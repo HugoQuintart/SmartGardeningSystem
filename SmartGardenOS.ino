@@ -108,11 +108,11 @@ lcd.clear(); // effacer l'écran lcd
     Serial.println("Failed to read from the DHT sensor !");
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.print("Erreur Capteur DHT");
+    lcd.print("DHT sensor error");
     lcd.setCursor(0,1);
-    lcd.print("Verifier la");
+    lcd.print("Please check");
     lcd.setCursor(0,2);
-    lcd.print("connexion");
+    lcd.print("the connection");
     delay(1000);
     lcd.clear();
     return;
@@ -122,20 +122,20 @@ lcd.clear(); // effacer l'écran lcd
   // On fait la conversion en Celcius dans la foulée
   float hi = dht.computeHeatIndex(f, h);
   // afficher dans le moniteur série
-  Serial.print("Humidite exterieure: ");
+  Serial.print("Hygrometry: ");
   Serial.print(h);
   Serial.print(" %, ");
-  Serial.print("Temperature exterieure: ");
+  Serial.print("Outdoor temperature: ");
   Serial.print(t);
   Serial.print(" *C,  ");
   // afficher sur l'écran
   lcd.setCursor(0, 0);
-  lcd.print("Humidite exterieure:");
+  lcd.print("Hygrometry:");
   lcd.setCursor(0,1);
   lcd.print(h);
   lcd.print(" %");
   lcd.setCursor(0, 2);
-  lcd.print("Temperature ext: ");
+  lcd.print("Outdoor temp: ");
   lcd.setCursor(0,3);
   lcd.print(t);
   lcd.print(" *C");
