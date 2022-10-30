@@ -8,50 +8,45 @@
     /  /   /  / /  /    /  / /  /      /  /   /  /         /  /
    /  /   /  / /  /____/  / /  /______/  /   /  /_________/  /
   /__/   /__/ /__________/ /____________/   /_______________/
-  Système d'exploitation du projet de l'exposcience.
+  This is the operating OS of my project
 */
-// préparer l'ecran lcd
-#include <LiquidCrystal.h>
+// preparing the lcd screen
+#include <LiquidCrystal.h> //including the library to use the screen
 LiquidCrystal lcd(11,9,6,5,4,3);
-// inclure les bibliothèque qui permettra l'utilisation de la sonde
-#include <DallasTemperature.h>
-#include <OneWire.h>
 
-// preparer le sonde:
-#define ONE_WIRE_BUS 39
+// preparing the temperature sensor
+#include <DallasTemperature.h> //including the libraries to use the sensor
+#include <OneWire.h> //including the libraries to use the sensor
+
+#define ONE_WIRE_BUS 39 //the communication pin (bus) is set on the pin 39
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
-// préparation de la DHT
-#include "DHT.h"   // Librairie des capteurs DHT
 
-#define DHTPIN 8    // le pin sur lequel est branché le DHT
-
-#define DHTTYPE DHT22      // DHT 22  (AM2302)
-
+// preparing the DHT sensor
+#include "DHT.h"   // include the library
+#define DHTPIN 8    // This is where the sensor should be plugged
+#define DHTTYPE DHT22 // I choosed the DHT22 sensor bc it is more precise, but you can use a DHT11 or wathever.
 DHT dht(DHTPIN, DHTTYPE);
 
-// le capteur de niveau d'eau 0 sur la pin 46
-int waterLevel;
-//étalonnage de la lecture hygrométrique:
-const int wet = 0;// on étalonne les capteurs d'hygrométrie avec une valeur "humide"
-const int dry = 1023; // on étalonne les capteurs d'hygrométrie avec une valeur "sèche"
+//Calibrating the soil moisture sensors
+const int wet = 0;// Setting the "wet" value to 0 according to the experiment (0 => 0V on the analog input and 1023 => 5V on the analog input)
+const int dry = 1023; // Setting the "dry" hygrometry value according to the experiment (0 => 0V on the analog input and 1023 => 5V on the analog input)
 
-//préparation des variables nécessaires à la lecture hygrométrique:
-bool reading = true; // système en mode automatique (par défaut)
-int moisturePin1 = A0; // Brancher le capteur d'hygrométrie sur la pin A0
-int moisturePin2 = A1; // Brancher le capteur d'hygrométrie sur la pin A1
-int moisturePin3 = A2; // Brancher le capteur d'hygrométrie sur la pin A2
-int moisturePin4 = A3; // Brancher le capteur d'hygrométrie sur la pin A3
-int moisturePin5 = A4; // Brancher le capteur d'hygrométrie sur la pin A4
-int moistureValue; // initialiser la variable moistureValue qui correspond à l'humidité du sol
-int moistureUsable; // initaliser la variable qui va stocker la valeur de la moyenne des valeurs des capteurs.
-int hygroVal; // initialiser la variable qui va socker le pourcentage d'humidité du sol.
+//Setting up the moisture analysis:
+int moisturePin1 = A0; // The first soil moisture sensor is plugged on the A0 pin of the Arduino board
+int moisturePin2 = A1; // The second soil moisture sensor is plugged on the A1 pin of the Arduino board
+int moisturePin3 = A2; // The third soil moisture sensor is plugged on the A2 pin of the Arduino board
+int moisturePin4 = A3; // The fourth soil moisture sensor is plugged on the A3 pin of the Arduino board
+int moisturePin5 = A4; // The fifth soil moisture sensor is plugged on the A4 pin of the Arduino board
+int moistureValue; // initializing the value which correspond to the soil moisture
+int moistureUsable; // initializing the value to store the value of the average of the sensors values
+int hygroVal; // Initialize the variable that stores the soil moisture percentage.
 
 
-//préparation des variables pour l'arrosage:
-int dryingPin = 42; // Définir la pin de la pompe de reprise sur la pin digitale 41
-int wateringPin = 41; // Brancher la pompe d'arrosage sur la pin digitale 44
-int wateringState; //initialiser la variable qui va stocker l'état de la pompe d'arrosage.
+//Setting up the watering process
+int dryingPin = 41; // The water suction pump is plugged on the pin 41 (by a relay bc the pump runs on 12VDC and the arduino can only provide 5VDC).
+int wateringPin = 42; // The water suction pump is plugged on the pin 42 (by a relay bc the pump runs on 12VDC and the arduino can only provide 5VDC).
+int wateringState; //Initialize the variable that stores the state of the watering pin (1 or 0).
 int dryingState; // initialiser la variable qui va stocker l'état de la pompe de reprise.
 
 //préparation des variables pour l'analyse de la température du sol
