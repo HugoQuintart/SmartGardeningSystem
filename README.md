@@ -1,5 +1,4 @@
 # SmartGardeningSystem
-# French version: https://github.com/HugoQuintart/SmartGardenOS
 SmartGardenOS is the open source operating system of my project,
 I'm working on this project since November 2020.
 It is a smart and economic watering system, so it waters the plantations with the right amount of water (depending of the humidity of the soil) and takes back the water that flewed down of the terrain.
@@ -14,3 +13,5 @@ If you want to make your smart gardening system, please read the following infor
 - I printed the plastic parts in PLA, but you can use your favorite material (except conductors like metal if you have a professionnal printer or a CNC machine ;-)  )
 
 If you have any question or idea about this project, please e-mail me at hugo.quintart@athenee-ath.be
+
+# French version: https://github.com/HugoQuintart/SmartGardenOS
