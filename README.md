@@ -7,8 +7,8 @@ All those datas are displayed on the screen on top of the box but you can import
 If you want to open the PDF file in this repo, you have to download it.
 # For DIY fans:
 If you want to make your smart gardening system, please read the following informations:
-- The 3D files are located in the ZIP files named "MeteoStation STL" and "Boitier"
-- The hardware that I used are wroten in the file named "listeComposants.txt"
+- The 3D files are located in the "3D" ZIP file.
+- The hardware that I used are wroten in the file named "HardwareList.txt"
 - If you are looking for a good 3D printer, I recommend the Wanhao Duplicator 12/230. It is a good and affordable 3d printer.
 - I printed the plastic parts in PLA, but you can use your favorite material (except conductors like metal if you have a professionnal printer or a CNC machine ;-)  )
 
