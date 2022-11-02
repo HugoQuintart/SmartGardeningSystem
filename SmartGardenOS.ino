@@ -8,70 +8,68 @@
     /  /   /  / /  /    /  / /  /      /  /   /  /         /  /
    /  /   /  / /  /____/  / /  /______/  /   /  /_________/  /
   /__/   /__/ /__________/ /____________/   /_______________/
-  This is the operating OS of my project
+
+  THis is the operating system of my project
 */
-// preparing the lcd screen
-#include <LiquidCrystal.h> //including the library to use the screen
-LiquidCrystal lcd(11,9,6,5,4,3);
+// prepare the LCD screen
+#include <LiquidCrystal.h> //including a library to use the screen
+LiquidCrystal lcd(11,9,6,5,4,3); //define the lcd communication buses
 
-// preparing the temperature sensor
-#include <DallasTemperature.h> //including the libraries to use the sensor
-#include <OneWire.h> //including the libraries to use the sensor
-
-#define ONE_WIRE_BUS 39 //the communication pin (bus) is set on the pin 39
+// including the two libraries to use the DS18B20 temperature sensor
+#include <DallasTemperature.h>
+#include <OneWire.h>
+// prepare the temp sensor
+#define ONE_WIRE_BUS 39 // define the communication pin
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
-// preparing the DHT sensor
-#include "DHT.h"   // include the library
-#define DHTPIN 8    // This is where the sensor should be plugged
-#define DHTTYPE DHT22 // I choosed the DHT22 sensor bc it is more precise, but you can use a DHT11 or wathever.
+// prepare the DHT sensor
+#include "DHT.h"   // including the library
+#define DHTPIN 8    // define the communication pin
+#define DHTTYPE DHT22      // define the DHT type
 DHT dht(DHTPIN, DHTTYPE);
 
-//Calibrating the soil moisture sensors
-const int wet = 0;// Setting the "wet" value to 0 according to the experiment (0 => 0V on the analog input and 1023 => 5V on the analog input)
-const int dry = 1023; // Setting the "dry" hygrometry value according to the experiment (0 => 0V on the analog input and 1023 => 5V on the analog input)
+//calibrate the moisture sensors
+const int wet = 0;// Setting a "wet value" depending of the recieved signal on the analog pin (1023 => 5V and 0 => 0V)
+const int dry = 1023; // Setting a "dry value" depending of the recieved signal on the analog pin (1023 => 5V and 0 => 0V)
+//prepare the soil moisture sentors:
+int moisturePin1 = A0; // Set the soil moisture sensor 1 on the pin A0
+int moisturePin2 = A1; // Set the soil moisture sensor 2 on the pin A1
+int moisturePin3 = A2; // Set the soil moisture sensor 3 on the pin A2
+int moisturePin4 = A3; // Set the soil moisture sensor 4 on the pin A3
+int moisturePin5 = A4; // Set the soil moisture sensor 5 on the pin A4
+int moistureValue; // initialize the soil moisture value (brut)
+int moistureUsable; // initalize the variable that stores the average of the sensors values.
+int hygroVal; // initialize the variable that stores the percentage of humidity.
 
-//Setting up the moisture analysis:
-int moisturePin1 = A0; // The first soil moisture sensor is plugged on the A0 pin of the Arduino board
-int moisturePin2 = A1; // The second soil moisture sensor is plugged on the A1 pin of the Arduino board
-int moisturePin3 = A2; // The third soil moisture sensor is plugged on the A2 pin of the Arduino board
-int moisturePin4 = A3; // The fourth soil moisture sensor is plugged on the A3 pin of the Arduino board
-int moisturePin5 = A4; // The fifth soil moisture sensor is plugged on the A4 pin of the Arduino board
-int moistureValue; // initializing the value which correspond to the soil moisture
-int moistureUsable; // initializing the value to store the value of the average of the sensors values
-int hygroVal; // Initialize the variable that stores the soil moisture percentage.
 
+//prepare some variables for the watering function:
+int dryingPin = 41; // Setting the draining pump on the 41st pin
+int wateringPin = 42; // Setting the watering pump on the 42nd pinµ
+//those variables are for debugging purposes
+int wateringState; 
+int dryingState; 
 
-//Setting up the watering process
-int dryingPin = 41; // The water suction pump is plugged on the pin 41 (by a relay bc the pump runs on 12VDC and the arduino can only provide 5VDC).
-int wateringPin = 42; // The water suction pump is plugged on the pin 42 (by a relay bc the pump runs on 12VDC and the arduino can only provide 5VDC).
-int wateringState; //Initialize the variable that stores the state of the watering pin (1 or 0).
-int dryingState; // initialiser la variable qui va stocker l'état de la pompe de reprise.
-
-//préparation des variables pour l'analyse de la température du sol
-
-//et le reste des variables:
 int statePin = 13; // la led d'état de la carte électronique sera la led sur la pin 13
 
 void setup() {
-  moistureValue = 0; // Définir la valeur moistureValue à 0
+  moistureValue = 0; // define the moistureValue to 0
 
-  pinMode(moisturePin1, INPUT); // Définir la pin du capteur d'hygrométrie comme entrée
-  pinMode(moisturePin2, INPUT); // Définir la pin du capteur d'hygrométrie comme entrée
-  pinMode(moisturePin3, INPUT); // Définir la pin du capteur d'hygrométrie comme entrée
-  pinMode(moisturePin4, INPUT); // Définir la pin du capteur d'hygrométrie comme entrée
-  pinMode(wateringPin, OUTPUT); // Définir la pin de la pompe d'arrosage comme sortie
-  pinMode(dryingPin, OUTPUT); // Définir la pin de la pompe de reprise en tant que sortie
-  pinMode(statePin, OUTPUT); // La led d'état correspond à la pin 13, en sortie de courant
+  pinMode(moisturePin1, INPUT); // Set the hygrometry sensor as an input.
+  pinMode(moisturePin2, INPUT); // Set the hygrometry sensor as an input.
+  pinMode(moisturePin3, INPUT); // Set the hygrometry sensor as an input.
+  pinMode(moisturePin4, INPUT); // Set the hygrometry sensor as an input.
+  pinMode(wateringPin, OUTPUT); // Define the relay of the watering pump as an output
+  pinMode(dryingPin, OUTPUT); // Define the relay of the draining pump as an output
+  pinMode(statePin, OUTPUT); 
 
   digitalWrite(statePin, HIGH);
 
-  Serial.begin(9600); // Initialiser le moniteur série en 9600 BAUD.
-  lcd.begin(20, 4); // Initialiser l'écran en lcd 20x4 (20 caractères sur 4 lignes)
-  dht.begin(); //démarrer la dht (pour mesures de l'humidité et de la température)
+  Serial.begin(9600); // Initialize the serial monitor in 9600 baud
+  lcd.begin(20, 4); // Define the LCD screen as a 20x4 screen (4 lines and 20 columns)
+  dht.begin(); //start the DHT sensor
   sensors.begin();
-  // Séquence de démarrage (nom SE, infos, Créateur)
+  // Booting payload (please consider not modifying those lines)
   lcd.begin(20,4);
   lcd.clear();
   lcd.setCursor(4,0);
@@ -88,44 +86,43 @@ void setup() {
 
 void loop() {
 
-  // ***********************************************partie DHT***********************************************
+  // ***********************************************DHT***********************************************
 lcd.clear(); // effacer l'écran lcd
   
-  // Lecture du taux d'humidité
+  // Reading humidity value
   float h = dht.readHumidity();
-  // Lecture de la température en Celcius
+  // Reading temperature in Celcius
   float t = dht.readTemperature();
-  // Pour lire la température en Fahrenheit
+  // Reading temp in Farenheit
   float f = dht.readTemperature(true);
 
-  // Stop le programme et renvoie un message d'erreur si le capteur ne renvoie aucune mesure
+  // This script will run if the DHT isn't connected
   if (isnan(h) || isnan(t) || isnan(f)) {
-    Serial.println("Failed to read from the DHT sensor !");
+    Serial.println("Failed to read from the DHT sensor, please check the connection");
     lcd.clear();
     lcd.setCursor(0,0);
     lcd.print("DHT sensor error");
     lcd.setCursor(0,1);
-    lcd.print("Please check");
+    lcd.print("Please check the");
     lcd.setCursor(0,2);
-    lcd.print("the connection");
-    delay(1000);
+    lcd.print("connection");
+    delay(500);
     lcd.clear();
     return;
   }
 
-  // Calcul la température ressentie. Il calcul est effectué à partir de la température en Fahrenheit
-  // On fait la conversion en Celcius dans la foulée
+ 
   float hi = dht.computeHeatIndex(f, h);
-  // afficher dans le moniteur série
-  Serial.print("Hygrometry: ");
+  // Printing datas in the serial monitor
+  Serial.print("Humidity: ");
   Serial.print(h);
   Serial.print(" %, ");
   Serial.print("Outdoor temperature: ");
   Serial.print(t);
   Serial.print(" *C,  ");
-  // afficher sur l'écran
+  // Displaying on the screen
   lcd.setCursor(0, 0);
-  lcd.print("Hygrometry:");
+  lcd.print("Outdoor humidity:");
   lcd.setCursor(0,1);
   lcd.print(h);
   lcd.print(" %");
@@ -134,30 +131,28 @@ lcd.clear(); // effacer l'écran lcd
   lcd.setCursor(0,3);
   lcd.print(t);
   lcd.print(" *C");
-  delay(2000); // définir un arrêt de 2 secondes pour faciliter la lecture sur l'écran
+  delay(2000); // 2second delay to make the screen reading easier
   
 
  
-  // ***********************************************partie arrosage**********************************************
+  // ***********************************************Watering**********************************************
   moistureValue = (analogRead(moisturePin1) + analogRead(moisturePin2) + analogRead(moisturePin3) + analogRead(moisturePin4) + analogRead(moisturePin5));
   moistureUsable = moistureValue / 5;
-  hygroVal = map(moistureUsable, dry, wet, 0, 100); // on défini les différents seuils initialisés au départ comme les seuils 0 et 100%
+  hygroVal = map(moistureUsable, dry, wet, 0, 100); // define the "wet" and "dry" variables as 0 and 100% of humidity.
   
-       // enclencher la pompe d'arrosage si l'humidité du sol est inférieure à 65%
-      if(hygroVal <= 65){
- Serial.println("wateringPin, HIGH");
+       // turn on the watering pump if the humidity is inferior to 70 %
+      if(hygroVal <= 70){
         digitalWrite(wateringPin, HIGH);
         wateringState = 1;
       }
-      // enclencher la pompe de reprise si l'humidité du sol dépasse les 90%
+      // turn on the draining pump if the humidity is superior to 90%
       if(hygroVal >= 90){
- Serial.println("dryingPin, HIGH");
         digitalWrite(dryingPin, HIGH);
         dryingState = 1;
       }
-      // arrêter les pompes quand on se situe à nouveau dans la fourchette adaptée à la plante.
+      // Turn off the pumps when the humidity is good.
       if (hygroVal  >= 80) {
-        if (hygroVal <= 74) {
+        if (hygroVal <= 71) {
  Serial.println("wateringPin, LOW");
           digitalWrite(wateringPin, LOW);
           wateringState = 0;
@@ -166,47 +161,52 @@ lcd.clear(); // effacer l'écran lcd
           dryingState = 0;
         }
       }
-      sensors.requestTemperatures(); // Envoyer l'ordre au capteur de donner la température un peu avant de l'afficher pour éviter les latences potentielles
-  // On décode les données du capteur de température pour les avoir sous forme de données que nous pourrions interpréter
+      sensors.requestTemperatures(); // Requesting the soil temp
+  // Decoding the recieved datas
   float tempC = sensors.getTempCByIndex(0);
 
-   // ***********************************************partie hygrométrie***********************************************
+   // ***********************************************Soil moisture analysis***********************************************
 
   moistureValue = (analogRead(moisturePin1) + analogRead(moisturePin2) + analogRead(moisturePin3) + analogRead(moisturePin4) + analogRead(moisturePin5));
   moistureUsable = moistureValue / 5;
-  hygroVal = map(moistureUsable, dry, wet, 0, 100); // on défini les différents seuils initialisés au départ comme les seuils 0 et 100%
-  Serial.print("Humidite du sol: ");
+  hygroVal = map(moistureUsable, dry, wet, 0, 100); // Using the "wet" and "dry" variables to define the percentage of humidity.
+  Serial.print("Soil moisture: ");
   Serial.print(hygroVal);
   Serial.print(" %, ");
   
   lcd.clear();
-  // On s'occupe de l'humidité
   lcd.setCursor(0, 0);
-  lcd.print("Humidite du sol: ");
+  lcd.print("Soil moisture: ");
   lcd.setCursor(0,1);
   lcd.print(hygroVal);
   lcd.print("%");
   
-  // ***********************************************partie mesure de la température***********************************************
+  // ***********************************************ground temperature***********************************************
 
-  // Check if reading was successful
+  // Check if the temp reading was successful
   if (tempC != DEVICE_DISCONNECTED_C)
   {
-    Serial.print("Temperature du sol:  ");
+    Serial.print("Soil temperature:  ");
     Serial.print(tempC);
     Serial.println(" C, ");
     lcd.setCursor(0, 2);
-    lcd.print("Temperature du sol: ");
+    lcd.print("Soil temperature: ");
     lcd.setCursor(0,3);
     lcd.print(tempC);
     lcd.print(" *C");
-    delay(2000); // définir un arrêt de 2 seconde pour faciliter la lecture sur l'écran
+    delay(2000);
   }
   else
   {
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("temp sensor error");
+    lcd.setCursor(0,1);
+    lcd.print("Please check the");
     lcd.setCursor(0,2);
-    lcd.print("Pas de sonde de t*.");
-    Serial.println("Error: Could not read temperature data");
+    lcd.print("connection");
+    Serial.println("Error: Could not read temperature data.");
+    delay(500);
+    return;
   }
-  
 }
