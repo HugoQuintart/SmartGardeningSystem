@@ -1,4 +1,5 @@
 # SmartGardeningSystem
+French version: https://github.com/HugoQuintart/SmartGardenOS
 SmartGardenOS is the open source operating system of my project,
 I'm working on this project since November 2020.
 It is a smart and economic watering system, so it waters the plantations with the right amount of water (depending of the humidity of the soil) and takes back the water that flewed down of the terrain.
