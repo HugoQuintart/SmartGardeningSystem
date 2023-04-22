@@ -15,3 +15,8 @@ If you want to make your smart gardening system, please read the following infor
 If you have any question or idea about this project, please e-mail me at hugo.quintart@athenee-ath.be
 
 # French version: https://github.com/HugoQuintart/SmartGardenOS
+
+![image](https://user-images.githubusercontent.com/98947898/233804508-c17f80a4-8970-455f-a51a-f2bc423157d2.png)
+![image](https://user-images.githubusercontent.com/98947898/233804519-318945fd-b74b-4350-8226-31cd4855491d.png)
+
+This project is under CC license. Do not sell, copy or make any profit on it please... I made it with love... it's a little like my baby!
